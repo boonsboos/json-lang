@@ -1,5 +1,7 @@
-const cli_args = process.argv.slice(2);
-const fs = require("fs");
+import { readFileSync } from 'node:fs';
+import { argv } from 'node:process';
+
+const cli_args = argv.slice(2);
 
 var FNDEFS = [];
 
@@ -81,7 +83,7 @@ function main() {
 
     var data;
     try {
-        data = fs.readFileSync(cli_args[0], "utf-8");
+        data = readFileSync(cli_args[0], "utf-8");
     } catch (e) {
         console.log(e);
     }
