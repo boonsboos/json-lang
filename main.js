@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
-import { argv } from 'node:process';
+import { argv, stdout } from 'node:process';
 
 const cli_args = argv.slice(2);
 
 var FNDEFS = [];
+var STACK = [];
 
 function getFunctionName(obj) {
     return Object.keys(obj)[0]; // there's only 1 item.
@@ -20,6 +21,12 @@ function getFunctionBody(name) {
         }
     };
     return [];
+}
+
+const builtins = {
+    ret: (args) => {
+        
+    }
 }
 
 function call(fn, args) {
@@ -39,8 +46,20 @@ function call(fn, args) {
         }
     });
 
-    if (fn.name == "print") {
-        console.log(args.join(' '));
+    switch(fn.name) {
+    case "print":
+        fn.args.forEach(element => {
+            if (typeof(element) == "object") {
+                stdout.write(STACK.pop());
+            } else {
+                stdout.write(""+element);
+            }
+            process.stdout.write(" ")
+        });
+        break;
+    case "ret":
+        STACK.push(args[0]); // no multiple return
+        return;
     }
 
     fn.body.forEach(element => {
@@ -55,6 +74,7 @@ function call(fn, args) {
 
         call(new_fn, args);
     });
+
 }
 
 function processJSON(json) {
@@ -68,7 +88,7 @@ function processJSON(json) {
 
         let fn = {
             name: name,
-            args: args,
+            args: [],
             body: getFunctionBody(name)
         }
 
@@ -76,19 +96,18 @@ function processJSON(json) {
     });
 }
 
-function main() {
-    if (cli_args.length == 0) {
-        console.log("i need a json file to do something");
-    }
+// main stuff
 
-    var data;
-    try {
-        data = readFileSync(cli_args[0], "utf-8");
-    } catch (e) {
-        console.log(e);
-    }
-
-    processJSON(JSON.parse(data));
+if (cli_args.length == 0) {
+    console.log("i need a json file to do something");
 }
 
-main();
+try {
+    processJSON(
+        JSON.parse(
+            readFileSync(cli_args[0], "utf-8")
+        )
+    );
+} catch (e) {
+    console.log(e);
+}

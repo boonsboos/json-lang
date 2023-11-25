@@ -2,16 +2,14 @@
     "defn": [
         {
             "name":"bup",
-            "args": [],
             "body": [
-                {"print": ["hello from bup"]}
+                {"ret": ["bup"]}
             ]
         }
     ],
 
     "main": [
-        {"print": ["hello world"]},
-        {"print": ["hello bup"]},
-        {"bup": [{"bup": [{"bup": []}]}]}
+        {"bup": []},
+        {"print": [{"bup": []}]}
     ]
 }
